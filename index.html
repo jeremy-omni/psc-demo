@@ -96,18 +96,67 @@
                 { week: 12, p10: 145000, p50: 175000, p90: 205000 }
             ],
             arrivals: [
-                { week: 1, totalQty: 0 },
-                { week: 2, totalQty: 0 },
-                { week: 3, totalQty: 85000 },
-                { week: 4, totalQty: 60000 },
-                { week: 5, totalQty: 95000 },
-                { week: 6, totalQty: 75000 },
-                { week: 7, totalQty: 140000 },
-                { week: 8, totalQty: 70000 },
-                { week: 9, totalQty: 85000 },
-                { week: 10, totalQty: 90000 },
-                { week: 11, totalQty: 65000 },
-                { week: 12, totalQty: 80000 }
+                { week: 1, totalQty: 0, pos: [] },
+                { week: 2, totalQty: 0, pos: [] },
+                {
+                    week: 3,
+                    totalQty: 85000,
+                    pos: [
+                        {
+                            po_number: 'PO-12345',
+                            supplier: 'Acme Paper Co.',
+                            rollstock: 'M23',
+                            width: 70.25,
+                            quantity_lf: 50000,
+                            cost: 25000,
+                            payment_status: 'Pending',
+                            ship_from: 'Cleveland, OH',
+                            ship_to: 'PSC Warehouse A',
+                            order_date: '2025-11-01',
+                            lead_time_weeks: 2
+                        },
+                        {
+                            po_number: 'PO-12346',
+                            supplier: 'Beta Materials Inc.',
+                            rollstock: 'M23',
+                            width: 70.25,
+                            quantity_lf: 35000,
+                            cost: 17500,
+                            payment_status: 'Paid',
+                            ship_from: 'Chicago, IL',
+                            ship_to: 'PSC Warehouse A',
+                            order_date: '2025-11-01',
+                            lead_time_weeks: 2
+                        }
+                    ]
+                },
+                {
+                    week: 4,
+                    totalQty: 60000,
+                    pos: [
+                        {
+                            po_number: 'PO-12347',
+                            supplier: 'Acme Paper Co.',
+                            rollstock: 'M23',
+                            width: 70.25,
+                            quantity_lf: 60000,
+                            cost: 30000,
+                            payment_status: 'Paid',
+                            ship_from: 'Cleveland, OH',
+                            ship_to: 'PSC Warehouse A',
+                            order_date: '2025-11-08',
+                            lead_time_weeks: 2
+                        }
+                    ]
+                },
+                { week: 5, totalQty: 95000, pos: [] },
+                { week: 6, totalQty: 75000, pos: [] },
+                { week: 7, totalQty: 140000, pos: [] },
+                { week: 8, totalQty: 70000, pos: [] },
+                { week: 9, totalQty: 85000, pos: [] },
+                { week: 10, totalQty: 90000, pos: [] },
+                { week: 11, totalQty: 65000, pos: [] },
+                { week: 12, totalQty: 80000, pos: [] }
             ],
             consumption: [
                 { week: 1, total: 65000, confirmed: 50000, expected: 15000 },
@@ -170,6 +219,7 @@
             const [selectedWidth, setSelectedWidth] = useState(70.25);
             const [purchaseData, setPurchaseData] = useState([...mockData.purchaseSchedule]);
             const [showDecomposed, setShowDecomposed] = useState(false);
+            const [selectedArrivalWeek, setSelectedArrivalWeek] = useState(null);
 
             const availableWidths = rollstockWidthCombinations.find(r => r.rollstock === selectedRollstock)?.widths || [];
 
@@ -449,6 +499,15 @@
                             type: 'bar',
                             data: arrivalsChartData,
                             options: {
+                                onClick: (event, elements) => {
+                                    if (elements.length > 0) {
+                                        const dataIndex = elements[0].index;
+                                        const weekData = mockData.arrivals[dataIndex];
+                                        if (weekData.pos.length > 0) {
+                                            setSelectedArrivalWeek(weekData);
+                                        }
+                                    }
+                                },
                                 plugins: {
                                     tooltip: {
                                         callbacks: {
@@ -458,8 +517,13 @@
                                                 const qty = mockData.arrivals[dataIndex].totalQty;
                                                 return `Arriving: ${qty.toLocaleString()} LF`;
                                             },
-                                            afterLabel: () => {
-                                                return 'Click to view PO details';
+                                            afterLabel: (context) => {
+                                                const dataIndex = context.dataIndex;
+                                                const pos = mockData.arrivals[dataIndex].pos;
+                                                if (pos.length > 0) {
+                                                    return `${pos.length} PO${pos.length > 1 ? 's' : ''} - Click to view details`;
+                                                }
+                                                return '';
                                             }
                                         }
                                     }
@@ -523,6 +587,76 @@
                             h('button', { className: 'px-6 py-2 bg-blue-500 text-white rounded-md font-medium' }, 'Purchase'),
                             h('button', { className: 'px-6 py-2 bg-bg-300 text-text-200 rounded-md font-medium hover:bg-bg-400 transition' }, 'Forecast'),
                             h('button', { className: 'px-6 py-2 bg-bg-300 text-text-200 rounded-md font-medium hover:bg-bg-400 transition' }, 'Demand Orders')
+                        )
+                    ),
+
+                    // PO Details Modal
+                    selectedArrivalWeek && h('div', {
+                        className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8',
+                        onClick: () => setSelectedArrivalWeek(null)
+                    },
+                        h('div', {
+                            className: 'bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-auto',
+                            onClick: (e) => e.stopPropagation()
+                        },
+                            h('div', { className: 'p-6' },
+                                h('div', { className: 'flex justify-between items-center mb-4' },
+                                    h('h3', { className: 'text-2xl font-bold text-text-100' }, `Week ${selectedArrivalWeek.week} Arrivals`),
+                                    h('button', {
+                                        onClick: () => setSelectedArrivalWeek(null),
+                                        className: 'text-text-200 hover:text-text-100 text-2xl'
+                                    }, '×')
+                                ),
+                                h('div', { className: 'mb-4 text-text-200' },
+                                    `Total: ${selectedArrivalWeek.totalQty.toLocaleString()} LF from ${selectedArrivalWeek.pos.length} PO${selectedArrivalWeek.pos.length > 1 ? 's' : ''}`
+                                ),
+                                h('div', { className: 'space-y-4' },
+                                    selectedArrivalWeek.pos.map(po =>
+                                        h('div', {
+                                            key: po.po_number,
+                                            className: 'border border-border-100 rounded-lg p-4 bg-bg-100'
+                                        },
+                                            h('div', { className: 'font-semibold text-lg text-text-100 mb-2' }, po.po_number),
+                                            h('div', { className: 'grid grid-cols-2 gap-3 text-sm' },
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Supplier'),
+                                                    h('div', { className: 'font-medium text-text-100' }, po.supplier)
+                                                ),
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Quantity'),
+                                                    h('div', { className: 'font-medium text-text-100' }, `${po.quantity_lf.toLocaleString()} LF`)
+                                                ),
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Cost'),
+                                                    h('div', { className: 'font-medium text-text-100' }, `$${po.cost.toLocaleString()}`)
+                                                ),
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Payment Status'),
+                                                    h('div', {
+                                                        className: `font-medium ${po.payment_status === 'Paid' ? 'text-green-600' : 'text-orange-600'}`
+                                                    }, po.payment_status)
+                                                ),
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Ship From'),
+                                                    h('div', { className: 'font-medium text-text-100' }, po.ship_from)
+                                                ),
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Ship To'),
+                                                    h('div', { className: 'font-medium text-text-100' }, po.ship_to)
+                                                ),
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Order Date'),
+                                                    h('div', { className: 'font-medium text-text-100' }, po.order_date)
+                                                ),
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Lead Time'),
+                                                    h('div', { className: 'font-medium text-text-100' }, `${po.lead_time_weeks} weeks`)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
                         )
                     )
                 )
