@@ -4,19 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PSC Purchase Planning Demo</title>
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- React and ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-    <!-- Babel Standalone for JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- Recharts -->
-    <script src="https://unpkg.com/recharts@2.5.0/dist/Recharts.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
         body {
@@ -27,15 +18,12 @@
 <body class="bg-gray-50">
     <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart, Cell } = Recharts;
+    <script>
+        const { useState, useEffect, useRef, createElement: h } = React;
+        const { createRoot } = ReactDOM;
 
-        // Mock Data Structure (from spec)
+        // Mock Data
         const mockData = {
-            rollstockWidth: 'M23 70.25',
-
-            // Panel 1: Purchase recommendations
             purchaseSchedule: [
                 { week: 1, currentQty: 85000, recommendedQty: 85000 },
                 { week: 2, currentQty: 60000, recommendedQty: 60000 },
@@ -50,133 +38,93 @@
                 { week: 11, currentQty: 95000, recommendedQty: 95000 },
                 { week: 12, currentQty: 75000, recommendedQty: 75000 }
             ],
-
-            // Panel 2: Inventory projection
             inventoryProjection: [
-                { week: 1, p10: 110000, p50: 120000, p90: 130000, rollstockDelivery: 0 },
-                { week: 2, p10: 100000, p50: 115000, p90: 125000, rollstockDelivery: 0 },
-                { week: 3, p10: 130000, p50: 145000, p90: 160000, rollstockDelivery: 85000 },
-                { week: 4, p10: 115000, p50: 130000, p90: 145000, rollstockDelivery: 0 },
-                { week: 5, p10: 135000, p50: 155000, p90: 175000, rollstockDelivery: 60000 },
-                { week: 6, p10: 120000, p50: 140000, p90: 160000, rollstockDelivery: 0 },
-                { week: 7, p10: 135000, p50: 160000, p90: 185000, rollstockDelivery: 95000 },
-                { week: 8, p10: 115000, p50: 135000, p90: 155000, rollstockDelivery: 0 },
-                { week: 9, p10: 125000, p50: 150000, p90: 175000, rollstockDelivery: 75000 },
-                { week: 10, p10: 140000, p50: 165000, p90: 190000, rollstockDelivery: 0 },
-                { week: 11, p10: 160000, p50: 190000, p90: 220000, rollstockDelivery: 140000 },
-                { week: 12, p10: 145000, p50: 175000, p90: 205000, rollstockDelivery: 0 }
+                { week: 1, p10: 110000, p50: 120000, p90: 130000 },
+                { week: 2, p10: 100000, p50: 115000, p90: 125000 },
+                { week: 3, p10: 130000, p50: 145000, p90: 160000 },
+                { week: 4, p10: 115000, p50: 130000, p90: 145000 },
+                { week: 5, p10: 135000, p50: 155000, p90: 175000 },
+                { week: 6, p10: 120000, p50: 140000, p90: 160000 },
+                { week: 7, p10: 135000, p50: 160000, p90: 185000 },
+                { week: 8, p10: 115000, p50: 135000, p90: 155000 },
+                { week: 9, p10: 125000, p50: 150000, p90: 175000 },
+                { week: 10, p10: 140000, p50: 165000, p90: 190000 },
+                { week: 11, p10: 160000, p50: 190000, p90: 220000 },
+                { week: 12, p10: 145000, p50: 175000, p90: 205000 }
             ],
-
-            // Panel 3: Arrivals with PO details
             arrivals: [
-                { week: 1, totalQty: 0, pos: [] },
-                { week: 2, totalQty: 0, pos: [] },
-                {
-                    week: 3,
-                    totalQty: 85000,
-                    pos: [
-                        {
-                            po_number: 'PO-12345',
-                            supplier: 'Acme Paper Co.',
-                            rollstock: 'M23',
-                            width: 70.25,
-                            quantity_lf: 50000,
-                            cost: 25000,
-                            payment_status: 'Pending',
-                            ship_from: 'Cleveland, OH',
-                            ship_to: 'PSC Warehouse A',
-                            order_date: '2025-11-01',
-                            expected_arrival_week: 3,
-                            lead_time_weeks: 2
-                        },
-                        {
-                            po_number: 'PO-12346',
-                            supplier: 'Beta Materials Inc.',
-                            rollstock: 'M23',
-                            width: 70.25,
-                            quantity_lf: 35000,
-                            cost: 17500,
-                            payment_status: 'Paid',
-                            ship_from: 'Chicago, IL',
-                            ship_to: 'PSC Warehouse A',
-                            order_date: '2025-11-01',
-                            expected_arrival_week: 3,
-                            lead_time_weeks: 2
-                        }
-                    ]
-                },
-                {
-                    week: 4,
-                    totalQty: 60000,
-                    pos: [
-                        {
-                            po_number: 'PO-12347',
-                            supplier: 'Acme Paper Co.',
-                            rollstock: 'M23',
-                            width: 70.25,
-                            quantity_lf: 60000,
-                            cost: 30000,
-                            payment_status: 'Paid',
-                            ship_from: 'Cleveland, OH',
-                            ship_to: 'PSC Warehouse A',
-                            order_date: '2025-11-08',
-                            expected_arrival_week: 4,
-                            lead_time_weeks: 2
-                        }
-                    ]
-                },
-                { week: 5, totalQty: 95000, pos: [] },
-                { week: 6, totalQty: 75000, pos: [] },
-                { week: 7, totalQty: 140000, pos: [] },
-                { week: 8, totalQty: 70000, pos: [] },
-                { week: 9, totalQty: 85000, pos: [] },
-                { week: 10, totalQty: 90000, pos: [] },
-                { week: 11, totalQty: 65000, pos: [] },
-                { week: 12, totalQty: 80000, pos: [] }
+                { week: 1, totalQty: 0 },
+                { week: 2, totalQty: 0 },
+                { week: 3, totalQty: 85000 },
+                { week: 4, totalQty: 60000 },
+                { week: 5, totalQty: 95000 },
+                { week: 6, totalQty: 75000 },
+                { week: 7, totalQty: 140000 },
+                { week: 8, totalQty: 70000 },
+                { week: 9, totalQty: 85000 },
+                { week: 10, totalQty: 90000 },
+                { week: 11, totalQty: 65000 },
+                { week: 12, totalQty: 80000 }
             ],
-
-            // Panel 4: Consumption breakdown
             consumption: [
-                { week: 1, total: 65000, confirmed: 50000, expected: 15000, orders: [] },
-                { week: 2, total: 70000, confirmed: 55000, expected: 15000, orders: [] },
-                { week: 3, total: 85000, confirmed: 65000, expected: 20000, orders: [] },
-                {
-                    week: 4,
-                    total: 100000,
-                    confirmed: 80000,
-                    expected: 20000,
-                    orders: [
-                        { id: 'order #1', box: 'box 2', qty: 12000 },
-                        { id: 'order #96', box: 'box 2', qty: 48000 },
-                        { id: 'order #145', box: 'box 7', qty: 40000 }
-                    ]
-                },
-                { week: 5, total: 115000, confirmed: 90000, expected: 25000, orders: [] },
-                { week: 6, total: 72000, confirmed: 58000, expected: 14000, orders: [] },
-                { week: 7, total: 88000, confirmed: 70000, expected: 18000, orders: [] },
-                { week: 8, total: 95000, confirmed: 75000, expected: 20000, orders: [] },
-                { week: 9, total: 68000, confirmed: 52000, expected: 16000, orders: [] },
-                { week: 10, total: 82000, confirmed: 65000, expected: 17000, orders: [] },
-                { week: 11, total: 98000, confirmed: 78000, expected: 20000, orders: [] },
-                { week: 12, total: 76000, confirmed: 60000, expected: 16000, orders: [] }
+                { week: 1, total: 65000, confirmed: 50000, expected: 15000 },
+                { week: 2, total: 70000, confirmed: 55000, expected: 15000 },
+                { week: 3, total: 85000, confirmed: 65000, expected: 20000 },
+                { week: 4, total: 100000, confirmed: 80000, expected: 20000 },
+                { week: 5, total: 115000, confirmed: 90000, expected: 25000 },
+                { week: 6, total: 72000, confirmed: 58000, expected: 14000 },
+                { week: 7, total: 88000, confirmed: 70000, expected: 18000 },
+                { week: 8, total: 95000, confirmed: 75000, expected: 20000 },
+                { week: 9, total: 68000, confirmed: 52000, expected: 16000 },
+                { week: 10, total: 82000, confirmed: 65000, expected: 17000 },
+                { week: 11, total: 98000, confirmed: 78000, expected: 20000 },
+                { week: 12, total: 76000, confirmed: 60000, expected: 16000 }
             ]
         };
 
-        // Rollstock/Width combinations
         const rollstockWidthCombinations = [
             { rollstock: 'M23', widths: [70.25, 72.5, 80.0] },
             { rollstock: 'M24', widths: [70.25, 75.0] },
             { rollstock: 'M25', widths: [80.0, 85.5] }
         ];
 
-        // Main App Component
+        // Chart Component
+        function ChartComponent({ type, data, options, height = 300 }) {
+            const canvasRef = useRef(null);
+            const chartRef = useRef(null);
+
+            useEffect(() => {
+                if (canvasRef.current) {
+                    if (chartRef.current) {
+                        chartRef.current.destroy();
+                    }
+                    const ctx = canvasRef.current.getContext('2d');
+                    chartRef.current = new Chart(ctx, {
+                        type: type,
+                        data: data,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            ...options
+                        }
+                    });
+                }
+                return () => {
+                    if (chartRef.current) {
+                        chartRef.current.destroy();
+                    }
+                };
+            }, [type, data, options]);
+
+            return h('canvas', { ref: canvasRef, style: { height: `${height}px` } });
+        }
+
+        // Main App
         function App() {
             const [selectedRollstock, setSelectedRollstock] = useState('M23');
             const [selectedWidth, setSelectedWidth] = useState(70.25);
-            const [purchaseData, setPurchaseData] = useState(mockData.purchaseSchedule);
-            const [savedPurchaseData, setSavedPurchaseData] = useState(mockData.purchaseSchedule);
+            const [purchaseData, setPurchaseData] = useState([...mockData.purchaseSchedule]);
             const [showDecomposed, setShowDecomposed] = useState(false);
-            const [selectedWeekOrders, setSelectedWeekOrders] = useState(null);
 
             const availableWidths = rollstockWidthCombinations.find(r => r.rollstock === selectedRollstock)?.widths || [];
 
@@ -190,7 +138,7 @@
             };
 
             const handleResetToRecommended = () => {
-                setPurchaseData(purchaseData.map(item => ({
+                setPurchaseData(mockData.purchaseSchedule.map(item => ({
                     ...item,
                     currentQty: item.recommendedQty
                 })));
@@ -204,7 +152,6 @@
             };
 
             const handleSave = () => {
-                setSavedPurchaseData(purchaseData);
                 alert('Purchase schedule saved!');
             };
 
@@ -214,197 +161,234 @@
                 ));
             };
 
-            return (
-                <div className="min-h-screen bg-gray-50 p-8">
-                    <div className="max-w-7xl mx-auto">
-                        {/* Header */}
-                        <h1 className="text-3xl font-bold text-gray-900 mb-8">PSC Purchase Planning</h1>
+            // Chart configurations
+            const purchaseChartData = {
+                labels: purchaseData.map(d => `Week ${d.week}`),
+                datasets: [
+                    {
+                        label: 'Current Purchase Plan',
+                        data: purchaseData.map(d => d.currentQty),
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'AI Recommendation',
+                        data: purchaseData.map(d => d.recommendedQty),
+                        type: 'line',
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            };
 
-                        {/* Rollstock Selector */}
-                        <div className="bg-white rounded-lg shadow p-6 mb-6">
-                            <div className="flex gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Rollstock</label>
-                                    <select
-                                        value={selectedRollstock}
-                                        onChange={handleRollstockChange}
-                                        className="border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    >
-                                        {rollstockWidthCombinations.map(r => (
-                                            <option key={r.rollstock} value={r.rollstock}>{r.rollstock}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Width</label>
-                                    <select
-                                        value={selectedWidth}
-                                        onChange={(e) => setSelectedWidth(parseFloat(e.target.value))}
-                                        className="border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    >
-                                        {availableWidths.map(w => (
-                                            <option key={w} value={w}>{w}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+            const inventoryChartData = {
+                labels: mockData.inventoryProjection.map(d => `Week ${d.week}`),
+                datasets: [
+                    {
+                        label: '90th Percentile',
+                        data: mockData.inventoryProjection.map(d => d.p90),
+                        borderColor: 'rgba(209, 213, 219, 0.5)',
+                        backgroundColor: 'rgba(243, 244, 246, 0.3)',
+                        fill: '+1',
+                        pointRadius: 0
+                    },
+                    {
+                        label: '50th Percentile',
+                        data: mockData.inventoryProjection.map(d => d.p50),
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        fill: false
+                    },
+                    {
+                        label: '10th Percentile',
+                        data: mockData.inventoryProjection.map(d => d.p10),
+                        borderColor: 'rgba(209, 213, 219, 0.5)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            };
 
-                        {/* Panel 1: Purchase Recommendations */}
-                        <div className="bg-white rounded-lg shadow p-6 mb-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-semibold text-gray-900">Recommended Purchase Schedule</h2>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={handleDoNothing}
-                                        className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
-                                    >
-                                        Do Nothing
-                                    </button>
-                                    <button
-                                        onClick={handleResetToRecommended}
-                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-                                    >
-                                        Reset to Recommended
-                                    </button>
-                                    <button
-                                        onClick={handleSave}
-                                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            </div>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <BarChart data={purchaseData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="week" label={{ value: 'Week', position: 'insideBottom', offset: -5 }} />
-                                    <YAxis label={{ value: 'Quantity (LF)', angle: -90, position: 'insideLeft' }} />
-                                    <Tooltip formatter={(value) => value.toLocaleString()} />
-                                    <Bar dataKey="currentQty" fill="#3b82f6" name="Current Purchase Plan" />
-                                    <Line type="monotone" dataKey="recommendedQty" stroke="#ef4444" strokeWidth={2} name="AI Recommendation" dot={false} />
-                                </BarChart>
-                            </ResponsiveContainer>
+            const arrivalsChartData = {
+                labels: mockData.arrivals.map(d => `Week ${d.week}`),
+                datasets: [
+                    {
+                        label: 'Incoming Shipments',
+                        data: mockData.arrivals.map(d => d.totalQty),
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
 
-                            {/* Editable Table */}
-                            <div className="mt-4 overflow-x-auto">
-                                <table className="min-w-full border-collapse">
-                                    <thead>
-                                        <tr>
-                                            {purchaseData.map(item => (
-                                                <th key={item.week} className="border border-gray-300 px-4 py-2 bg-gray-50">
-                                                    Week {item.week}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            {purchaseData.map(item => (
-                                                <td key={item.week} className="border border-gray-300 px-2 py-2">
-                                                    <input
-                                                        type="number"
-                                                        value={item.currentQty}
-                                                        onChange={(e) => handleQuantityChange(item.week, parseInt(e.target.value) || 0)}
-                                                        step="1000"
-                                                        className="w-full px-2 py-1 border border-gray-300 rounded text-center"
-                                                    />
-                                                </td>
-                                            ))}
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+            const consumptionChartData = showDecomposed ? {
+                labels: mockData.consumption.map(d => `Week ${d.week}`),
+                datasets: [
+                    {
+                        label: 'Confirmed',
+                        data: mockData.consumption.map(d => d.confirmed),
+                        backgroundColor: 'rgba(30, 64, 175, 0.8)',
+                        borderColor: 'rgba(30, 64, 175, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Expected',
+                        data: mockData.consumption.map(d => d.expected),
+                        backgroundColor: 'rgba(147, 197, 253, 0.8)',
+                        borderColor: 'rgba(147, 197, 253, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            } : {
+                labels: mockData.consumption.map(d => `Week ${d.week}`),
+                datasets: [
+                    {
+                        label: 'Total Consumption',
+                        data: mockData.consumption.map(d => d.total),
+                        backgroundColor: 'rgba(96, 165, 250, 0.8)',
+                        borderColor: 'rgba(96, 165, 250, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
 
-                        {/* Panel 2: Inventory Projection */}
-                        <div className="bg-white rounded-lg shadow p-6 mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Inventory - On Hand and In Transit</h2>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <AreaChart data={mockData.inventoryProjection}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="week" label={{ value: 'Week', position: 'insideBottom', offset: -5 }} />
-                                    <YAxis label={{ value: 'Inventory (LF)', angle: -90, position: 'insideLeft' }} />
-                                    <Tooltip formatter={(value) => value.toLocaleString()} />
-                                    <Area type="monotone" dataKey="p90" stroke="#d1d5db" fill="#f3f4f6" name="90th Percentile" />
-                                    <Area type="monotone" dataKey="p10" stroke="#d1d5db" fill="#ffffff" name="10th Percentile" />
-                                    <Line type="monotone" dataKey="p50" stroke="#3b82f6" strokeWidth={2} name="50th Percentile" dot={{ r: 4 }} />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
+            return h('div', { className: 'min-h-screen bg-gray-50 p-8' },
+                h('div', { className: 'max-w-7xl mx-auto' },
+                    h('h1', { className: 'text-3xl font-bold text-gray-900 mb-8' }, 'PSC Purchase Planning'),
 
-                        {/* Panel 3: Inventory Arrivals */}
-                        <div className="bg-white rounded-lg shadow p-6 mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Inventory Arrivals</h2>
-                            <ResponsiveContainer width="100%" height={300}>
-                                <BarChart data={mockData.arrivals}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="week" label={{ value: 'Week', position: 'insideBottom', offset: -5 }} />
-                                    <YAxis label={{ value: 'Arriving Qty (LF)', angle: -90, position: 'insideLeft' }} />
-                                    <Tooltip formatter={(value) => value.toLocaleString()} />
-                                    <Bar dataKey="totalQty" fill="#10b981" name="Incoming Shipments" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
+                    // Rollstock Selector
+                    h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
+                        h('div', { className: 'flex gap-4' },
+                            h('div', null,
+                                h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, 'Rollstock'),
+                                h('select', {
+                                    value: selectedRollstock,
+                                    onChange: handleRollstockChange,
+                                    className: 'border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                }, rollstockWidthCombinations.map(r =>
+                                    h('option', { key: r.rollstock, value: r.rollstock }, r.rollstock)
+                                ))
+                            ),
+                            h('div', null,
+                                h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, 'Width'),
+                                h('select', {
+                                    value: selectedWidth,
+                                    onChange: (e) => setSelectedWidth(parseFloat(e.target.value)),
+                                    className: 'border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                }, availableWidths.map(w =>
+                                    h('option', { key: w, value: w }, w)
+                                ))
+                            )
+                        )
+                    ),
 
-                        {/* Panel 4: Consumption */}
-                        <div className="bg-white rounded-lg shadow p-6 mb-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-semibold text-gray-900">Consumption (Forecast Demand)</h2>
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={showDecomposed}
-                                        onChange={(e) => setShowDecomposed(e.target.checked)}
-                                        className="w-4 h-4"
-                                    />
-                                    <span className="text-sm font-medium text-gray-700">Decompose into confirmed and expected</span>
-                                </label>
-                            </div>
-                            <ResponsiveContainer width="100%" height={300}>
-                                {showDecomposed ? (
-                                    <BarChart data={mockData.consumption}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="week" label={{ value: 'Week', position: 'insideBottom', offset: -5 }} />
-                                        <YAxis label={{ value: 'Consumption (LF)', angle: -90, position: 'insideLeft' }} />
-                                        <Tooltip formatter={(value) => value.toLocaleString()} />
-                                        <Bar dataKey="confirmed" stackId="a" fill="#1e40af" name="Confirmed" />
-                                        <Bar dataKey="expected" stackId="a" fill="#93c5fd" name="Expected" />
-                                    </BarChart>
-                                ) : (
-                                    <BarChart data={mockData.consumption}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="week" label={{ value: 'Week', position: 'insideBottom', offset: -5 }} />
-                                        <YAxis label={{ value: 'Consumption (LF)', angle: -90, position: 'insideLeft' }} />
-                                        <Tooltip formatter={(value) => value.toLocaleString()} />
-                                        <Bar dataKey="total" fill="#60a5fa" name="Total Consumption" />
-                                    </BarChart>
-                                )}
-                            </ResponsiveContainer>
-                        </div>
+                    // Panel 1: Purchase Recommendations
+                    h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
+                        h('div', { className: 'flex justify-between items-center mb-4' },
+                            h('h2', { className: 'text-xl font-semibold text-gray-900' }, 'Recommended Purchase Schedule'),
+                            h('div', { className: 'flex gap-2' },
+                                h('button', {
+                                    onClick: handleDoNothing,
+                                    className: 'px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition text-sm'
+                                }, 'Do Nothing'),
+                                h('button', {
+                                    onClick: handleResetToRecommended,
+                                    className: 'px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition text-sm'
+                                }, 'Reset to Recommended'),
+                                h('button', {
+                                    onClick: handleSave,
+                                    className: 'px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition text-sm'
+                                }, 'Save')
+                            )
+                        ),
+                        h(ChartComponent, { type: 'bar', data: purchaseChartData }),
+                        h('div', { className: 'mt-4 overflow-x-auto' },
+                            h('table', { className: 'min-w-full border-collapse text-sm' },
+                                h('thead', null,
+                                    h('tr', null,
+                                        purchaseData.map(item =>
+                                            h('th', {
+                                                key: item.week,
+                                                className: 'border border-gray-300 px-2 py-2 bg-gray-50'
+                                            }, `Week ${item.week}`)
+                                        )
+                                    )
+                                ),
+                                h('tbody', null,
+                                    h('tr', null,
+                                        purchaseData.map(item =>
+                                            h('td', {
+                                                key: item.week,
+                                                className: 'border border-gray-300 px-1 py-2'
+                                            },
+                                                h('input', {
+                                                    type: 'number',
+                                                    value: item.currentQty,
+                                                    onChange: (e) => handleQuantityChange(item.week, parseInt(e.target.value) || 0),
+                                                    step: '1000',
+                                                    className: 'w-full px-2 py-1 border border-gray-300 rounded text-center text-sm'
+                                                })
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
 
-                        {/* Tab Navigation */}
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <div className="flex gap-4">
-                                <button className="px-6 py-2 bg-blue-500 text-white rounded-md font-medium">
-                                    Purchase
-                                </button>
-                                <button className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition">
-                                    Forecast
-                                </button>
-                                <button className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition">
-                                    Demand Orders
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    // Panel 2: Inventory Projection
+                    h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
+                        h('h2', { className: 'text-xl font-semibold text-gray-900 mb-4' }, 'Inventory - On Hand and In Transit'),
+                        h(ChartComponent, { type: 'line', data: inventoryChartData })
+                    ),
+
+                    // Panel 3: Inventory Arrivals
+                    h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
+                        h('h2', { className: 'text-xl font-semibold text-gray-900 mb-4' }, 'Inventory Arrivals'),
+                        h(ChartComponent, { type: 'bar', data: arrivalsChartData })
+                    ),
+
+                    // Panel 4: Consumption
+                    h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
+                        h('div', { className: 'flex justify-between items-center mb-4' },
+                            h('h2', { className: 'text-xl font-semibold text-gray-900' }, 'Consumption (Forecast Demand)'),
+                            h('label', { className: 'flex items-center gap-2' },
+                                h('input', {
+                                    type: 'checkbox',
+                                    checked: showDecomposed,
+                                    onChange: (e) => setShowDecomposed(e.target.checked),
+                                    className: 'w-4 h-4'
+                                }),
+                                h('span', { className: 'text-sm font-medium text-gray-700' }, 'Decompose into confirmed and expected')
+                            )
+                        ),
+                        h(ChartComponent, {
+                            type: 'bar',
+                            data: consumptionChartData,
+                            options: showDecomposed ? { scales: { x: { stacked: true }, y: { stacked: true } } } : {}
+                        })
+                    ),
+
+                    // Tab Navigation
+                    h('div', { className: 'bg-white rounded-lg shadow p-6' },
+                        h('div', { className: 'flex gap-4' },
+                            h('button', { className: 'px-6 py-2 bg-blue-500 text-white rounded-md font-medium' }, 'Purchase'),
+                            h('button', { className: 'px-6 py-2 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition' }, 'Forecast'),
+                            h('button', { className: 'px-6 py-2 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition' }, 'Demand Orders')
+                        )
+                    )
+                )
             );
         }
 
-        // Render App
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        const root = createRoot(document.getElementById('root'));
+        root.render(h(App));
     </script>
 </body>
 </html>
