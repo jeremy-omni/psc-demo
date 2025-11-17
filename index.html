@@ -4,18 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PSC Purchase Planning Demo</title>
+
+    <!-- Omniapp Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Quattrocento:wght@400;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bg-100': 'hsl(48 33.3% 97.1%)',
+                        'bg-200': 'hsl(53 28.6% 94.5%)',
+                        'bg-300': 'hsl(48 25% 92.2%)',
+                        'bg-400': 'hsl(50 20.7% 88.6%)',
+                        'bg-500': 'hsl(50 16.7% 84%)',
+                        'text-100': 'hsl(60 2.6% 7.6%)',
+                        'text-200': 'hsl(60 2.5% 23.3%)',
+                        'text-300': 'hsl(60 2.5% 23.3%)',
+                        'text-400': 'hsl(51 31.1% 43.7%)',
+                        'accent-100': 'hsl(15 55.6% 52.4%)',
+                        'accent-200': 'hsl(15 63.1% 59.6%)',
+                        'danger-100': 'hsl(0 58.6% 34.1%)',
+                        'danger-200': 'hsl(0 75% 75%)',
+                        'border-100': 'hsl(30 3.3% 11.8% / 15%)',
+                        'chart-1': 'oklch(0.646 0.222 41.116)',
+                        'chart-2': 'oklch(0.6 0.118 184.704)',
+                        'chart-3': 'oklch(0.398 0.07 227.392)',
+                        'chart-4': 'oklch(0.828 0.189 84.429)',
+                        'chart-5': 'oklch(0.769 0.188 70.08)',
+                    },
+                    fontFamily: {
+                        sans: ['Mulish', 'Helvetica', 'sans-serif'],
+                        serif: ['Quattrocento', 'serif'],
+                    },
+                    borderRadius: {
+                        'lg': '0.625rem',
+                    }
+                }
+            }
+        }
+    </script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Mulish', Helvetica, sans-serif;
+            font-size: 15px;
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-bg-100">
     <div id="root"></div>
 
     <script>
@@ -170,16 +213,17 @@
                     {
                         label: 'Current Purchase Plan',
                         data: purchaseData.map(d => d.currentQty),
-                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 1
+                        backgroundColor: 'oklch(0.646 0.222 41.116 / 0.85)',
+                        borderColor: 'oklch(0.646 0.222 41.116)',
+                        borderWidth: 1,
+                        borderRadius: 4
                     },
                     {
                         label: 'AI Recommendation',
                         data: purchaseData.map(d => d.recommendedQty),
                         type: 'line',
-                        borderColor: 'rgba(239, 68, 68, 1)',
-                        borderWidth: 2,
+                        borderColor: 'hsl(0 58.6% 34.1%)',
+                        borderWidth: 3,
                         pointRadius: 0,
                         fill: false
                     }
@@ -192,26 +236,29 @@
                     {
                         label: '90th Percentile',
                         data: mockData.inventoryProjection.map(d => d.p90),
-                        borderColor: 'rgba(209, 213, 219, 0.5)',
-                        backgroundColor: 'rgba(243, 244, 246, 0.3)',
+                        borderColor: 'hsl(50 20.7% 88.6% / 0.8)',
+                        backgroundColor: 'hsl(50 20.7% 88.6% / 0.3)',
                         fill: '+1',
-                        pointRadius: 0
+                        pointRadius: 0,
+                        borderWidth: 1
                     },
                     {
                         label: '50th Percentile',
                         data: mockData.inventoryProjection.map(d => d.p50),
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 2,
-                        pointRadius: 4,
+                        borderColor: 'oklch(0.6 0.118 184.704)',
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: 'oklch(0.6 0.118 184.704)',
                         fill: false
                     },
                     {
                         label: '10th Percentile',
                         data: mockData.inventoryProjection.map(d => d.p10),
-                        borderColor: 'rgba(209, 213, 219, 0.5)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderColor: 'hsl(50 20.7% 88.6% / 0.8)',
+                        backgroundColor: 'transparent',
                         fill: false,
-                        pointRadius: 0
+                        pointRadius: 0,
+                        borderWidth: 1
                     }
                 ]
             };
@@ -222,9 +269,10 @@
                     {
                         label: 'Incoming Shipments',
                         data: mockData.arrivals.map(d => d.totalQty),
-                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                        borderColor: 'rgba(16, 185, 129, 1)',
-                        borderWidth: 1
+                        backgroundColor: 'oklch(0.828 0.189 84.429 / 0.85)',
+                        borderColor: 'oklch(0.828 0.189 84.429)',
+                        borderWidth: 1,
+                        borderRadius: 4
                     }
                 ]
             };
@@ -235,16 +283,18 @@
                     {
                         label: 'Confirmed',
                         data: mockData.consumption.map(d => d.confirmed),
-                        backgroundColor: 'rgba(30, 64, 175, 0.8)',
-                        borderColor: 'rgba(30, 64, 175, 1)',
-                        borderWidth: 1
+                        backgroundColor: 'oklch(0.398 0.07 227.392 / 0.9)',
+                        borderColor: 'oklch(0.398 0.07 227.392)',
+                        borderWidth: 1,
+                        borderRadius: 4
                     },
                     {
                         label: 'Expected',
                         data: mockData.consumption.map(d => d.expected),
-                        backgroundColor: 'rgba(147, 197, 253, 0.8)',
-                        borderColor: 'rgba(147, 197, 253, 1)',
-                        borderWidth: 1
+                        backgroundColor: 'oklch(0.6 0.118 184.704 / 0.6)',
+                        borderColor: 'oklch(0.6 0.118 184.704)',
+                        borderWidth: 1,
+                        borderRadius: 4
                     }
                 ]
             } : {
@@ -253,36 +303,37 @@
                     {
                         label: 'Total Consumption',
                         data: mockData.consumption.map(d => d.total),
-                        backgroundColor: 'rgba(96, 165, 250, 0.8)',
-                        borderColor: 'rgba(96, 165, 250, 1)',
-                        borderWidth: 1
+                        backgroundColor: 'oklch(0.6 0.118 184.704 / 0.85)',
+                        borderColor: 'oklch(0.6 0.118 184.704)',
+                        borderWidth: 1,
+                        borderRadius: 4
                     }
                 ]
             };
 
-            return h('div', { className: 'min-h-screen bg-gray-50 p-8' },
+            return h('div', { className: 'min-h-screen bg-bg-100 p-8' },
                 h('div', { className: 'max-w-7xl mx-auto' },
-                    h('h1', { className: 'text-3xl font-bold text-gray-900 mb-8' }, 'PSC Purchase Planning'),
+                    h('h1', { className: 'text-3xl font-bold text-text-100 mb-8' }, 'PSC Purchase Planning'),
 
                     // Rollstock Selector
                     h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
                         h('div', { className: 'flex gap-4' },
                             h('div', null,
-                                h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, 'Rollstock'),
+                                h('label', { className: 'block text-sm font-medium text-text-200 mb-2' }, 'Rollstock'),
                                 h('select', {
                                     value: selectedRollstock,
                                     onChange: handleRollstockChange,
-                                    className: 'border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                    className: 'border border-border-100 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                                 }, rollstockWidthCombinations.map(r =>
                                     h('option', { key: r.rollstock, value: r.rollstock }, r.rollstock)
                                 ))
                             ),
                             h('div', null,
-                                h('label', { className: 'block text-sm font-medium text-gray-700 mb-2' }, 'Width'),
+                                h('label', { className: 'block text-sm font-medium text-text-200 mb-2' }, 'Width'),
                                 h('select', {
                                     value: selectedWidth,
                                     onChange: (e) => setSelectedWidth(parseFloat(e.target.value)),
-                                    className: 'border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                                    className: 'border border-border-100 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                                 }, availableWidths.map(w =>
                                     h('option', { key: w, value: w }, w)
                                 ))
@@ -293,7 +344,7 @@
                     // Panel 1: Purchase Recommendations
                     h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
                         h('div', { className: 'flex justify-between items-center mb-4' },
-                            h('h2', { className: 'text-xl font-semibold text-gray-900' }, 'Recommended Purchase Schedule'),
+                            h('h2', { className: 'text-xl font-semibold text-text-100' }, 'Recommended Purchase Schedule'),
                             h('div', { className: 'flex gap-2' },
                                 h('button', {
                                     onClick: handleDoNothing,
@@ -305,39 +356,23 @@
                                 }, 'Reset to Recommended'),
                                 h('button', {
                                     onClick: handleSave,
-                                    className: 'px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition text-sm'
+                                    className: 'px-4 py-2 bg-accent-100 text-white rounded-md hover:bg-accent-200 transition text-sm'
                                 }, 'Save')
                             )
                         ),
                         h(ChartComponent, { type: 'bar', data: purchaseChartData }),
-                        h('div', { className: 'mt-4 overflow-x-auto' },
-                            h('table', { className: 'min-w-full border-collapse text-sm' },
-                                h('thead', null,
-                                    h('tr', null,
-                                        purchaseData.map(item =>
-                                            h('th', {
-                                                key: item.week,
-                                                className: 'border border-gray-300 px-2 py-2 bg-gray-50'
-                                            }, `Week ${item.week}`)
-                                        )
-                                    )
-                                ),
-                                h('tbody', null,
-                                    h('tr', null,
-                                        purchaseData.map(item =>
-                                            h('td', {
-                                                key: item.week,
-                                                className: 'border border-gray-300 px-1 py-2'
-                                            },
-                                                h('input', {
-                                                    type: 'number',
-                                                    value: item.currentQty,
-                                                    onChange: (e) => handleQuantityChange(item.week, parseInt(e.target.value) || 0),
-                                                    step: '1000',
-                                                    className: 'w-full px-2 py-1 border border-gray-300 rounded text-center text-sm'
-                                                })
-                                            )
-                                        )
+                        h('div', { className: 'mt-6' },
+                            h('div', { className: 'grid grid-cols-12 gap-2' },
+                                purchaseData.map(item =>
+                                    h('div', { key: item.week, className: 'flex flex-col' },
+                                        h('div', { className: 'text-center text-xs font-medium text-text-200 mb-2' }, `Week ${item.week}`),
+                                        h('input', {
+                                            type: 'number',
+                                            value: item.currentQty,
+                                            onChange: (e) => handleQuantityChange(item.week, parseInt(e.target.value) || 0),
+                                            step: '1000',
+                                            className: 'w-full px-2 py-2 border border-border-100 rounded text-center text-sm focus:ring-2 focus:ring-accent-100 focus:border-accent-100'
+                                        })
                                     )
                                 )
                             )
@@ -346,20 +381,20 @@
 
                     // Panel 2: Inventory Projection
                     h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
-                        h('h2', { className: 'text-xl font-semibold text-gray-900 mb-4' }, 'Inventory - On Hand and In Transit'),
+                        h('h2', { className: 'text-xl font-semibold text-text-100 mb-4' }, 'Inventory - On Hand and In Transit'),
                         h(ChartComponent, { type: 'line', data: inventoryChartData })
                     ),
 
                     // Panel 3: Inventory Arrivals
                     h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
-                        h('h2', { className: 'text-xl font-semibold text-gray-900 mb-4' }, 'Inventory Arrivals'),
+                        h('h2', { className: 'text-xl font-semibold text-text-100 mb-4' }, 'Inventory Arrivals'),
                         h(ChartComponent, { type: 'bar', data: arrivalsChartData })
                     ),
 
                     // Panel 4: Consumption
                     h('div', { className: 'bg-white rounded-lg shadow p-6 mb-6' },
                         h('div', { className: 'flex justify-between items-center mb-4' },
-                            h('h2', { className: 'text-xl font-semibold text-gray-900' }, 'Consumption (Forecast Demand)'),
+                            h('h2', { className: 'text-xl font-semibold text-text-100' }, 'Consumption (Forecast Demand)'),
                             h('label', { className: 'flex items-center gap-2' },
                                 h('input', {
                                     type: 'checkbox',
@@ -367,7 +402,7 @@
                                     onChange: (e) => setShowDecomposed(e.target.checked),
                                     className: 'w-4 h-4'
                                 }),
-                                h('span', { className: 'text-sm font-medium text-gray-700' }, 'Decompose into confirmed and expected')
+                                h('span', { className: 'text-sm font-medium text-text-200' }, 'Decompose into confirmed and expected')
                             )
                         ),
                         h(ChartComponent, {
@@ -381,8 +416,8 @@
                     h('div', { className: 'bg-white rounded-lg shadow p-6' },
                         h('div', { className: 'flex gap-4' },
                             h('button', { className: 'px-6 py-2 bg-blue-500 text-white rounded-md font-medium' }, 'Purchase'),
-                            h('button', { className: 'px-6 py-2 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition' }, 'Forecast'),
-                            h('button', { className: 'px-6 py-2 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition' }, 'Demand Orders')
+                            h('button', { className: 'px-6 py-2 bg-bg-300 text-text-200 rounded-md font-medium hover:bg-bg-400 transition' }, 'Forecast'),
+                            h('button', { className: 'px-6 py-2 bg-bg-300 text-text-200 rounded-md font-medium hover:bg-bg-400 transition' }, 'Demand Orders')
                         )
                     )
                 )
