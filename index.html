@@ -62,7 +62,7 @@
     <div id="root"></div>
 
     <script>
-        const { useState, useEffect, useRef, createElement: h } = React;
+        const { useState, useEffect, useRef, useMemo, createElement: h } = React;
         const { createRoot } = ReactDOM;
 
         // Mock Data
@@ -231,11 +231,9 @@
             const canvasRef = useRef(null);
             const chartRef = useRef(null);
 
+            // Initialize chart once
             useEffect(() => {
-                if (canvasRef.current) {
-                    if (chartRef.current) {
-                        chartRef.current.destroy();
-                    }
+                if (canvasRef.current && !chartRef.current) {
                     const ctx = canvasRef.current.getContext('2d');
                     chartRef.current = new Chart(ctx, {
                         type: type,
@@ -250,9 +248,23 @@
                 return () => {
                     if (chartRef.current) {
                         chartRef.current.destroy();
+                        chartRef.current = null;
                     }
                 };
-            }, [type, data, options]);
+            }, []);
+
+            // Update chart when data or options change
+            useEffect(() => {
+                if (chartRef.current) {
+                    chartRef.current.data = data;
+                    chartRef.current.options = {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        ...options
+                    };
+                    chartRef.current.update('none'); // 'none' animation mode for instant updates
+                }
+            }, [data, options]);
 
             return h('div', { style: { height: `${height}px`, position: 'relative' } },
                 h('canvas', { ref: canvasRef })
@@ -304,7 +316,7 @@
             };
 
             // Chart configurations
-            const purchaseChartData = {
+            const purchaseChartData = useMemo(() => ({
                 labels: purchaseData.map(d => `Week ${d.week}`),
                 datasets: [
                     {
@@ -325,9 +337,9 @@
                         fill: false
                     }
                 ]
-            };
+            }), [purchaseData]);
 
-            const inventoryChartData = {
+            const inventoryChartData = useMemo(() => ({
                 labels: mockData.inventoryProjection.map(d => `Week ${d.week}`),
                 datasets: [
                     {
@@ -358,9 +370,9 @@
                         borderWidth: 1
                     }
                 ]
-            };
+            }), []);
 
-            const arrivalsChartData = {
+            const arrivalsChartData = useMemo(() => ({
                 labels: mockData.arrivals.map(d => `Week ${d.week}`),
                 datasets: [
                     {
@@ -372,9 +384,9 @@
                         borderRadius: 4
                     }
                 ]
-            };
+            }), []);
 
-            const consumptionChartData = showDecomposed ? {
+            const consumptionChartData = useMemo(() => showDecomposed ? {
                 labels: mockData.consumption.map(d => `Week ${d.week}`),
                 datasets: [
                     {
@@ -406,7 +418,144 @@
                         borderRadius: 4
                     }
                 ]
-            };
+            }, [showDecomposed]);
+
+            const purchaseChartOptions = useMemo(() => ({
+                layout: {
+                    padding: {
+                        left: 45,
+                        right: 45
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => items[0].label,
+                            label: (context) => {
+                                const dataIndex = context.dataIndex;
+                                const current = purchaseData[dataIndex].currentQty;
+                                const recommended = purchaseData[dataIndex].recommendedQty;
+                                if (context.datasetIndex === 0) {
+                                    return `Current Purchase Plan: ${current.toLocaleString()} LF`;
+                                } else {
+                                    return `AI Recommendation: ${recommended.toLocaleString()} LF`;
+                                }
+                            },
+                            afterLabel: (context) => {
+                                const dataIndex = context.dataIndex;
+                                const current = purchaseData[dataIndex].currentQty;
+                                const recommended = purchaseData[dataIndex].recommendedQty;
+                                const diff = current - recommended;
+                                if (diff !== 0) {
+                                    return `Difference: ${diff > 0 ? '+' : ''}${diff.toLocaleString()} LF`;
+                                }
+                                return '';
+                            }
+                        }
+                    }
+                }
+            }), [purchaseData]);
+
+            const inventoryChartOptions = useMemo(() => ({
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => items[0].label,
+                            label: (context) => {
+                                const dataIndex = context.dataIndex;
+                                const item = mockData.inventoryProjection[dataIndex];
+                                if (context.datasetIndex === 0) {
+                                    return `90th Percentile: ${item.p90.toLocaleString()} LF`;
+                                } else if (context.datasetIndex === 1) {
+                                    return `50th Percentile: ${item.p50.toLocaleString()} LF`;
+                                } else {
+                                    return `10th Percentile: ${item.p10.toLocaleString()} LF`;
+                                }
+                            },
+                            afterBody: (items) => {
+                                const dataIndex = items[0].dataIndex;
+                                const item = mockData.inventoryProjection[dataIndex];
+                                return `\nRange: ${(item.p90 - item.p10).toLocaleString()} LF`;
+                            }
+                        }
+                    }
+                }
+            }), []);
+
+            const arrivalsChartOptions = useMemo(() => ({
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const dataIndex = elements[0].index;
+                        const weekData = mockData.arrivals[dataIndex];
+                        if (weekData.pos.length > 0) {
+                            setSelectedArrivalWeek(weekData);
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => items[0].label,
+                            label: (context) => {
+                                const dataIndex = context.dataIndex;
+                                const qty = mockData.arrivals[dataIndex].totalQty;
+                                return `Arriving: ${qty.toLocaleString()} LF`;
+                            },
+                            afterLabel: (context) => {
+                                const dataIndex = context.dataIndex;
+                                const pos = mockData.arrivals[dataIndex].pos;
+                                if (pos.length > 0) {
+                                    return `${pos.length} PO${pos.length > 1 ? 's' : ''} - Click to view details`;
+                                }
+                                return '';
+                            }
+                        }
+                    }
+                }
+            }), [setSelectedArrivalWeek]);
+
+            const consumptionChartOptions = useMemo(() => ({
+                ...(showDecomposed ? { scales: { x: { stacked: true }, y: { stacked: true } } } : {}),
+                onClick: (event, elements) => {
+                    if (showDecomposed && elements.length > 0) {
+                        const dataIndex = elements[0].index;
+                        const weekData = mockData.consumption[dataIndex];
+                        if (weekData.orders.length > 0) {
+                            setSelectedConsumptionWeek(weekData);
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: (items) => items[0].label,
+                            label: (context) => {
+                                const dataIndex = context.dataIndex;
+                                const item = mockData.consumption[dataIndex];
+                                if (showDecomposed) {
+                                    if (context.datasetIndex === 0) {
+                                        return `Confirmed: ${item.confirmed.toLocaleString()} LF`;
+                                    } else {
+                                        return `Expected: ${item.expected.toLocaleString()} LF`;
+                                    }
+                                } else {
+                                    return `Total: ${item.total.toLocaleString()} LF`;
+                                }
+                            },
+                            afterLabel: (context) => {
+                                if (showDecomposed) {
+                                    const dataIndex = context.dataIndex;
+                                    const orders = mockData.consumption[dataIndex].orders;
+                                    if (orders.length > 0) {
+                                        return `${orders.length} order${orders.length > 1 ? 's' : ''} - Click to view details`;
+                                    }
+                                }
+                                return '';
+                            }
+                        }
+                    }
+                }
+            }), [showDecomposed, setSelectedConsumptionWeek]);
 
             return h('div', { className: 'min-h-screen bg-bg-100 p-8' },
                 h('div', { className: 'max-w-7xl mx-auto' },
@@ -460,41 +609,7 @@
                         h(ChartComponent, {
                             type: 'bar',
                             data: purchaseChartData,
-                            options: {
-                                layout: {
-                                    padding: {
-                                        left: 45,
-                                        right: 45
-                                    }
-                                },
-                                plugins: {
-                                    tooltip: {
-                                        callbacks: {
-                                            title: (items) => items[0].label,
-                                            label: (context) => {
-                                                const dataIndex = context.dataIndex;
-                                                const current = purchaseData[dataIndex].currentQty;
-                                                const recommended = purchaseData[dataIndex].recommendedQty;
-                                                if (context.datasetIndex === 0) {
-                                                    return `Current Purchase Plan: ${current.toLocaleString()} LF`;
-                                                } else {
-                                                    return `AI Recommendation: ${recommended.toLocaleString()} LF`;
-                                                }
-                                            },
-                                            afterLabel: (context) => {
-                                                const dataIndex = context.dataIndex;
-                                                const current = purchaseData[dataIndex].currentQty;
-                                                const recommended = purchaseData[dataIndex].recommendedQty;
-                                                const diff = current - recommended;
-                                                if (diff !== 0) {
-                                                    return `Difference: ${diff > 0 ? '+' : ''}${diff.toLocaleString()} LF`;
-                                                }
-                                                return '';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            options: purchaseChartOptions
                         }),
                         h('div', { className: 'mt-2', style: { display: 'flex', gap: '4px', paddingLeft: '45px', paddingRight: '45px' } },
                             purchaseData.map(item =>
@@ -517,31 +632,7 @@
                         h(ChartComponent, {
                             type: 'line',
                             data: inventoryChartData,
-                            options: {
-                                plugins: {
-                                    tooltip: {
-                                        callbacks: {
-                                            title: (items) => items[0].label,
-                                            label: (context) => {
-                                                const dataIndex = context.dataIndex;
-                                                const item = mockData.inventoryProjection[dataIndex];
-                                                if (context.datasetIndex === 0) {
-                                                    return `90th Percentile: ${item.p90.toLocaleString()} LF`;
-                                                } else if (context.datasetIndex === 1) {
-                                                    return `50th Percentile: ${item.p50.toLocaleString()} LF`;
-                                                } else {
-                                                    return `10th Percentile: ${item.p10.toLocaleString()} LF`;
-                                                }
-                                            },
-                                            afterBody: (items) => {
-                                                const dataIndex = items[0].dataIndex;
-                                                const item = mockData.inventoryProjection[dataIndex];
-                                                return `\nRange: ${(item.p90 - item.p10).toLocaleString()} LF`;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            options: inventoryChartOptions
                         })
                     ),
 
@@ -551,37 +642,7 @@
                         h(ChartComponent, {
                             type: 'bar',
                             data: arrivalsChartData,
-                            options: {
-                                onClick: (event, elements) => {
-                                    if (elements.length > 0) {
-                                        const dataIndex = elements[0].index;
-                                        const weekData = mockData.arrivals[dataIndex];
-                                        if (weekData.pos.length > 0) {
-                                            setSelectedArrivalWeek(weekData);
-                                        }
-                                    }
-                                },
-                                plugins: {
-                                    tooltip: {
-                                        callbacks: {
-                                            title: (items) => items[0].label,
-                                            label: (context) => {
-                                                const dataIndex = context.dataIndex;
-                                                const qty = mockData.arrivals[dataIndex].totalQty;
-                                                return `Arriving: ${qty.toLocaleString()} LF`;
-                                            },
-                                            afterLabel: (context) => {
-                                                const dataIndex = context.dataIndex;
-                                                const pos = mockData.arrivals[dataIndex].pos;
-                                                if (pos.length > 0) {
-                                                    return `${pos.length} PO${pos.length > 1 ? 's' : ''} - Click to view details`;
-                                                }
-                                                return '';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            options: arrivalsChartOptions
                         })
                     ),
 
@@ -602,48 +663,7 @@
                         h(ChartComponent, {
                             type: 'bar',
                             data: consumptionChartData,
-                            options: {
-                                ...(showDecomposed ? { scales: { x: { stacked: true }, y: { stacked: true } } } : {}),
-                                onClick: (event, elements) => {
-                                    if (showDecomposed && elements.length > 0) {
-                                        const dataIndex = elements[0].index;
-                                        const weekData = mockData.consumption[dataIndex];
-                                        if (weekData.orders.length > 0) {
-                                            setSelectedConsumptionWeek(weekData);
-                                        }
-                                    }
-                                },
-                                plugins: {
-                                    tooltip: {
-                                        callbacks: {
-                                            title: (items) => items[0].label,
-                                            label: (context) => {
-                                                const dataIndex = context.dataIndex;
-                                                const item = mockData.consumption[dataIndex];
-                                                if (showDecomposed) {
-                                                    if (context.datasetIndex === 0) {
-                                                        return `Confirmed: ${item.confirmed.toLocaleString()} LF`;
-                                                    } else {
-                                                        return `Expected: ${item.expected.toLocaleString()} LF`;
-                                                    }
-                                                } else {
-                                                    return `Total: ${item.total.toLocaleString()} LF`;
-                                                }
-                                            },
-                                            afterLabel: (context) => {
-                                                if (showDecomposed) {
-                                                    const dataIndex = context.dataIndex;
-                                                    const orders = mockData.consumption[dataIndex].orders;
-                                                    if (orders.length > 0) {
-                                                        return `${orders.length} order${orders.length > 1 ? 's' : ''} - Click to view details`;
-                                                    }
-                                                }
-                                                return '';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            options: consumptionChartOptions
                         })
                     ),
 

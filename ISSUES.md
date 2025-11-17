@@ -4,7 +4,7 @@
 
 **Type:** Performance / User Experience
 **Priority:** High
-**Status:** Open
+**Status:** Resolved
 
 ### Description
 Charts are redrawing/re-rendering on every user action (clicking buttons, typing in inputs, etc.), which creates a distracting visual flash/flicker.
@@ -37,12 +37,31 @@ The issue is likely in the `ChartComponent`'s `useEffect` dependency array. Curr
 5. Notice charts redraw again
 
 ### Acceptance Criteria
-- [ ] Charts only redraw when their actual data changes
-- [ ] No chart redrawing when editing inputs
-- [ ] No chart redrawing when clicking unrelated buttons
-- [ ] Smooth chart updates when data does change
+- [x] Charts only redraw when their actual data changes
+- [x] No chart redrawing when editing inputs
+- [x] No chart redrawing when clicking unrelated buttons
+- [x] Smooth chart updates when data does change
+
+### Resolution
+**Date Resolved:** 2025-11-16
+
+**Changes Made:**
+1. Updated `ChartComponent` to separate initialization from updates
+   - Chart is now created once on mount
+   - Subsequent changes use `chart.update('none')` instead of destroying/recreating
+2. Memoized all chart data using `useMemo` with proper dependencies
+   - `purchaseChartData` depends on `purchaseData`
+   - `inventoryChartData` has no dependencies (static data)
+   - `arrivalsChartData` has no dependencies (static data)
+   - `consumptionChartData` depends on `showDecomposed`
+3. Memoized all chart options using `useMemo` with proper dependencies
+   - Prevents recreation of options objects on every render
+   - Callbacks now properly reference memoized data
+
+**Result:** Charts no longer flash/redraw on unrelated actions. Only update when their actual data changes.
 
 ---
 
 *Created: 2024-11-16*
 *Reported by: User feedback during demo testing*
+*Resolved: 2025-11-16*
