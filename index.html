@@ -159,18 +159,64 @@
                 { week: 12, totalQty: 80000, pos: [] }
             ],
             consumption: [
-                { week: 1, total: 65000, confirmed: 50000, expected: 15000 },
-                { week: 2, total: 70000, confirmed: 55000, expected: 15000 },
-                { week: 3, total: 85000, confirmed: 65000, expected: 20000 },
-                { week: 4, total: 100000, confirmed: 80000, expected: 20000 },
-                { week: 5, total: 115000, confirmed: 90000, expected: 25000 },
-                { week: 6, total: 72000, confirmed: 58000, expected: 14000 },
-                { week: 7, total: 88000, confirmed: 70000, expected: 18000 },
-                { week: 8, total: 95000, confirmed: 75000, expected: 20000 },
-                { week: 9, total: 68000, confirmed: 52000, expected: 16000 },
-                { week: 10, total: 82000, confirmed: 65000, expected: 17000 },
-                { week: 11, total: 98000, confirmed: 78000, expected: 20000 },
-                { week: 12, total: 76000, confirmed: 60000, expected: 16000 }
+                {
+                    week: 1,
+                    total: 65000,
+                    confirmed: 50000,
+                    expected: 15000,
+                    orders: [
+                        { id: 'ORD-001', customer: 'ABC Corp', box: 'Box 2', qty: 30000, status: 'Confirmed', shipDate: '2025-11-05' },
+                        { id: 'ORD-002', customer: 'XYZ Ltd', box: 'Box 5', qty: 20000, status: 'Confirmed', shipDate: '2025-11-07' }
+                    ]
+                },
+                {
+                    week: 2,
+                    total: 70000,
+                    confirmed: 55000,
+                    expected: 15000,
+                    orders: [
+                        { id: 'ORD-003', customer: 'Acme Industries', box: 'Box 2', qty: 25000, status: 'Confirmed', shipDate: '2025-11-12' },
+                        { id: 'ORD-004', customer: 'GlobalTech', box: 'Box 3', qty: 30000, status: 'Confirmed', shipDate: '2025-11-14' }
+                    ]
+                },
+                {
+                    week: 3,
+                    total: 85000,
+                    confirmed: 65000,
+                    expected: 20000,
+                    orders: [
+                        { id: 'ORD-005', customer: 'MegaCorp', box: 'Box 2', qty: 35000, status: 'Confirmed', shipDate: '2025-11-19' },
+                        { id: 'ORD-006', customer: 'TechStart', box: 'Box 4', qty: 30000, status: 'Confirmed', shipDate: '2025-11-21' }
+                    ]
+                },
+                {
+                    week: 4,
+                    total: 100000,
+                    confirmed: 80000,
+                    expected: 20000,
+                    orders: [
+                        { id: 'ORD-007', customer: 'ABC Corp', box: 'Box 2', qty: 12000, status: 'Confirmed', shipDate: '2025-11-25' },
+                        { id: 'ORD-008', customer: 'Premier Supply', box: 'Box 2', qty: 48000, status: 'Confirmed', shipDate: '2025-11-27' },
+                        { id: 'ORD-009', customer: 'National Dist', box: 'Box 7', qty: 20000, status: 'Confirmed', shipDate: '2025-11-28' }
+                    ]
+                },
+                {
+                    week: 5,
+                    total: 115000,
+                    confirmed: 90000,
+                    expected: 25000,
+                    orders: [
+                        { id: 'ORD-010', customer: 'XYZ Ltd', box: 'Box 2', qty: 45000, status: 'Confirmed', shipDate: '2025-12-02' },
+                        { id: 'ORD-011', customer: 'GlobalTech', box: 'Box 5', qty: 45000, status: 'Confirmed', shipDate: '2025-12-05' }
+                    ]
+                },
+                { week: 6, total: 72000, confirmed: 58000, expected: 14000, orders: [] },
+                { week: 7, total: 88000, confirmed: 70000, expected: 18000, orders: [] },
+                { week: 8, total: 95000, confirmed: 75000, expected: 20000, orders: [] },
+                { week: 9, total: 68000, confirmed: 52000, expected: 16000, orders: [] },
+                { week: 10, total: 82000, confirmed: 65000, expected: 17000, orders: [] },
+                { week: 11, total: 98000, confirmed: 78000, expected: 20000, orders: [] },
+                { week: 12, total: 76000, confirmed: 60000, expected: 16000, orders: [] }
             ]
         };
 
@@ -220,6 +266,7 @@
             const [purchaseData, setPurchaseData] = useState([...mockData.purchaseSchedule]);
             const [showDecomposed, setShowDecomposed] = useState(false);
             const [selectedArrivalWeek, setSelectedArrivalWeek] = useState(null);
+            const [selectedConsumptionWeek, setSelectedConsumptionWeek] = useState(null);
 
             const availableWidths = rollstockWidthCombinations.find(r => r.rollstock === selectedRollstock)?.widths || [];
 
@@ -551,6 +598,15 @@
                             data: consumptionChartData,
                             options: {
                                 ...(showDecomposed ? { scales: { x: { stacked: true }, y: { stacked: true } } } : {}),
+                                onClick: (event, elements) => {
+                                    if (showDecomposed && elements.length > 0) {
+                                        const dataIndex = elements[0].index;
+                                        const weekData = mockData.consumption[dataIndex];
+                                        if (weekData.orders.length > 0) {
+                                            setSelectedConsumptionWeek(weekData);
+                                        }
+                                    }
+                                },
                                 plugins: {
                                     tooltip: {
                                         callbacks: {
@@ -570,7 +626,11 @@
                                             },
                                             afterLabel: (context) => {
                                                 if (showDecomposed) {
-                                                    return 'Click to view order details';
+                                                    const dataIndex = context.dataIndex;
+                                                    const orders = mockData.consumption[dataIndex].orders;
+                                                    if (orders.length > 0) {
+                                                        return `${orders.length} order${orders.length > 1 ? 's' : ''} - Click to view details`;
+                                                    }
                                                 }
                                                 return '';
                                             }
@@ -651,6 +711,74 @@
                                                 h('div', null,
                                                     h('div', { className: 'text-text-200' }, 'Lead Time'),
                                                     h('div', { className: 'font-medium text-text-100' }, `${po.lead_time_weeks} weeks`)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+
+                    // Order Details Modal
+                    selectedConsumptionWeek && h('div', {
+                        className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8',
+                        onClick: () => setSelectedConsumptionWeek(null)
+                    },
+                        h('div', {
+                            className: 'bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-auto',
+                            onClick: (e) => e.stopPropagation()
+                        },
+                            h('div', { className: 'p-6' },
+                                h('div', { className: 'flex justify-between items-center mb-4' },
+                                    h('h3', { className: 'text-2xl font-bold text-text-100' }, `Week ${selectedConsumptionWeek.week} Consumption`),
+                                    h('button', {
+                                        onClick: () => setSelectedConsumptionWeek(null),
+                                        className: 'text-text-200 hover:text-text-100 text-2xl'
+                                    }, '×')
+                                ),
+                                h('div', { className: 'mb-4 grid grid-cols-3 gap-4 text-sm' },
+                                    h('div', null,
+                                        h('div', { className: 'text-text-200' }, 'Total Consumption'),
+                                        h('div', { className: 'font-semibold text-lg text-text-100' }, `${selectedConsumptionWeek.total.toLocaleString()} LF`)
+                                    ),
+                                    h('div', null,
+                                        h('div', { className: 'text-text-200' }, 'Confirmed'),
+                                        h('div', { className: 'font-semibold text-lg text-green-600' }, `${selectedConsumptionWeek.confirmed.toLocaleString()} LF`)
+                                    ),
+                                    h('div', null,
+                                        h('div', { className: 'text-text-200' }, 'Expected'),
+                                        h('div', { className: 'font-semibold text-lg text-orange-600' }, `${selectedConsumptionWeek.expected.toLocaleString()} LF`)
+                                    )
+                                ),
+                                h('div', { className: 'mb-3 text-text-200 font-medium' }, 'Customer Orders'),
+                                h('div', { className: 'space-y-3' },
+                                    selectedConsumptionWeek.orders.map(order =>
+                                        h('div', {
+                                            key: order.id,
+                                            className: 'border border-border-100 rounded-lg p-4 bg-bg-100'
+                                        },
+                                            h('div', { className: 'flex justify-between items-start mb-3' },
+                                                h('div', null,
+                                                    h('div', { className: 'font-semibold text-lg text-text-100' }, order.id),
+                                                    h('div', { className: 'text-sm text-text-200 mt-1' }, order.customer)
+                                                ),
+                                                h('div', {
+                                                    className: 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700'
+                                                }, order.status)
+                                            ),
+                                            h('div', { className: 'grid grid-cols-3 gap-3 text-sm' },
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Box Type'),
+                                                    h('div', { className: 'font-medium text-text-100' }, order.box)
+                                                ),
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Quantity'),
+                                                    h('div', { className: 'font-medium text-text-100' }, `${order.qty.toLocaleString()} LF`)
+                                                ),
+                                                h('div', null,
+                                                    h('div', { className: 'text-text-200' }, 'Ship Date'),
+                                                    h('div', { className: 'font-medium text-text-100' }, order.shipDate)
                                                 )
                                             )
                                         )
