@@ -461,6 +461,12 @@
                             type: 'bar',
                             data: purchaseChartData,
                             options: {
+                                layout: {
+                                    padding: {
+                                        left: 45,
+                                        right: 45
+                                    }
+                                },
                                 plugins: {
                                     tooltip: {
                                         callbacks: {
@@ -490,7 +496,7 @@
                                 }
                             }
                         }),
-                        h('div', { className: 'mt-2', style: { display: 'flex', gap: '4px', paddingLeft: '10px', paddingRight: '10px' } },
+                        h('div', { className: 'mt-2', style: { display: 'flex', gap: '4px', paddingLeft: '45px', paddingRight: '45px' } },
                             purchaseData.map(item =>
                                 h('div', { key: item.week, style: { flex: '1 1 0', minWidth: 0 } },
                                     h('input', {
