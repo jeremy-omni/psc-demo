@@ -116,7 +116,9 @@
                 };
             }, [type, data, options]);
 
-            return h('canvas', { ref: canvasRef, style: { height: `${height}px` } });
+            return h('div', { style: { height: `${height}px`, position: 'relative' } },
+                h('canvas', { ref: canvasRef })
+            );
         }
 
         // Main App
