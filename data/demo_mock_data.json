@@ -1,0 +1,833 @@
+{
+  "rollstockWidthCombinations": [
+    {
+      "rollstock": "L55",
+      "widths": [
+        24.625,
+        28.0,
+        28.125,
+        30.0,
+        33.75,
+        34.625,
+        36.0,
+        38.0,
+        38.125,
+        38.5,
+        39.875,
+        40.0,
+        41.75,
+        43.625,
+        46.625,
+        48.0,
+        50.5,
+        56.125,
+        58.125,
+        60.0,
+        63.0,
+        64.0,
+        76.0,
+        79.0,
+        84.0,
+        91.0,
+        94.0,
+        98.0,
+        103.0,
+        107.0,
+        110.0
+      ]
+    },
+    {
+      "rollstock": "L35",
+      "widths": [
+        24.625,
+        26.0,
+        26.75,
+        29.0,
+        30.0,
+        32.0,
+        34.875,
+        36.0,
+        38.5,
+        40.0,
+        43.875,
+        44.25,
+        44.875,
+        45.625,
+        46.625,
+        47.75,
+        48.75,
+        50.5,
+        53.375,
+        56.875,
+        58.125,
+        58.75,
+        60.0,
+        63.0,
+        64.0,
+        64.625,
+        76.0,
+        79.0,
+        84.0,
+        91.0,
+        98.0,
+        103.0,
+        107.0,
+        110.0
+      ]
+    },
+    {
+      "rollstock": "M23",
+      "widths": [
+        24.625,
+        26.0,
+        26.75,
+        29.0,
+        30.0,
+        32.0,
+        34.875,
+        36.0,
+        38.5,
+        40.0,
+        43.875,
+        44.25,
+        44.75,
+        44.875,
+        45.625,
+        46.625,
+        47.75,
+        48.75,
+        50.5,
+        53.375,
+        54.375,
+        56.875,
+        58.125,
+        59.875,
+        62.875,
+        64.0,
+        75.875,
+        78.875,
+        83.875,
+        90.875,
+        97.875,
+        98.875,
+        102.875,
+        106.875,
+        109.875
+      ]
+    },
+    {
+      "rollstock": "SBS12",
+      "widths": [
+        33.125,
+        37.9375,
+        40.0,
+        42.875,
+        47.75,
+        50.0,
+        50.5,
+        56.625,
+        57.25,
+        58.0,
+        58.75,
+        64.0,
+        64.125
+      ]
+    },
+    {
+      "rollstock": "M33",
+      "widths": [
+        24.625,
+        27.5,
+        30.0,
+        33.75,
+        34.875,
+        36.0,
+        38.125,
+        38.875,
+        40.0,
+        43.625,
+        43.875,
+        44.25,
+        46.625,
+        47.75,
+        48.75,
+        49.0,
+        50.5,
+        54.375,
+        57.875,
+        58.75,
+        59.875,
+        60.0,
+        62.875,
+        63.0,
+        64.0,
+        75.875,
+        78.875,
+        83.875,
+        90.875,
+        97.875,
+        102.875,
+        106.875,
+        109.875
+      ]
+    },
+    {
+      "rollstock": "M33HP",
+      "widths": [
+        28.125,
+        30.0,
+        34.625,
+        36.0,
+        40.0,
+        43.875,
+        44.25,
+        46.625,
+        75.875,
+        78.875,
+        83.875,
+        90.875,
+        93.875,
+        97.875,
+        98.875,
+        102.875,
+        106.875,
+        109.875
+      ]
+    },
+    {
+      "rollstock": "L35HP",
+      "widths": [
+        63.0,
+        76.0,
+        79.0,
+        84.0,
+        91.0,
+        98.0,
+        103.0,
+        107.0,
+        110.0
+      ]
+    },
+    {
+      "rollstock": "SBS09",
+      "widths": [
+        23.625,
+        34.5,
+        35.75,
+        37.375,
+        40.0,
+        42.875,
+        43.875,
+        45.125,
+        47.75,
+        48.75,
+        53.375,
+        56.125,
+        58.0,
+        61.0,
+        64.125
+      ]
+    },
+    {
+      "rollstock": "M36HP",
+      "widths": [
+        28.125,
+        30.0,
+        34.625,
+        35.25,
+        36.0,
+        38.0,
+        56.125
+      ]
+    },
+    {
+      "rollstock": "L563W",
+      "widths": [
+        34.625,
+        34.875,
+        36.0,
+        40.0,
+        54.5,
+        60.0,
+        63.0,
+        76.0,
+        79.0,
+        84.0,
+        88.0,
+        91.0,
+        98.0,
+        103.0,
+        107.0,
+        110.0
+      ]
+    }
+  ],
+  "purchaseSchedule": [
+    {
+      "week": 1,
+      "currentQty": 13000,
+      "recommendedQty": 13000
+    },
+    {
+      "week": 2,
+      "currentQty": 0,
+      "recommendedQty": 0
+    },
+    {
+      "week": 3,
+      "currentQty": 21000,
+      "recommendedQty": 21000
+    },
+    {
+      "week": 4,
+      "currentQty": 25000,
+      "recommendedQty": 25000
+    },
+    {
+      "week": 5,
+      "currentQty": 0,
+      "recommendedQty": 0
+    },
+    {
+      "week": 6,
+      "currentQty": 15000,
+      "recommendedQty": 15000
+    },
+    {
+      "week": 7,
+      "currentQty": 34000,
+      "recommendedQty": 34000
+    },
+    {
+      "week": 8,
+      "currentQty": 3000,
+      "recommendedQty": 3000
+    },
+    {
+      "week": 9,
+      "currentQty": 4000,
+      "recommendedQty": 4000
+    },
+    {
+      "week": 10,
+      "currentQty": 0,
+      "recommendedQty": 0
+    },
+    {
+      "week": 11,
+      "currentQty": 24000,
+      "recommendedQty": 24000
+    },
+    {
+      "week": 12,
+      "currentQty": 0,
+      "recommendedQty": 0
+    }
+  ],
+  "inventoryProjection": [
+    {
+      "week": 1,
+      "p10": 110000,
+      "p50": 125000,
+      "p90": 140000
+    },
+    {
+      "week": 2,
+      "p10": 115000,
+      "p50": 130000,
+      "p90": 145000
+    },
+    {
+      "week": 3,
+      "p10": 120000,
+      "p50": 135000,
+      "p90": 150000
+    },
+    {
+      "week": 4,
+      "p10": 125000,
+      "p50": 140000,
+      "p90": 155000
+    },
+    {
+      "week": 5,
+      "p10": 130000,
+      "p50": 145000,
+      "p90": 160000
+    },
+    {
+      "week": 6,
+      "p10": 135000,
+      "p50": 150000,
+      "p90": 165000
+    },
+    {
+      "week": 7,
+      "p10": 140000,
+      "p50": 155000,
+      "p90": 170000
+    },
+    {
+      "week": 8,
+      "p10": 145000,
+      "p50": 160000,
+      "p90": 175000
+    },
+    {
+      "week": 9,
+      "p10": 150000,
+      "p50": 165000,
+      "p90": 180000
+    },
+    {
+      "week": 10,
+      "p10": 155000,
+      "p50": 170000,
+      "p90": 185000
+    },
+    {
+      "week": 11,
+      "p10": 160000,
+      "p50": 175000,
+      "p90": 190000
+    },
+    {
+      "week": 12,
+      "p10": 165000,
+      "p50": 180000,
+      "p90": 195000
+    }
+  ],
+  "arrivals": [
+    {
+      "week": 1,
+      "totalQty": 0,
+      "pos": []
+    },
+    {
+      "week": 2,
+      "totalQty": 0,
+      "pos": []
+    },
+    {
+      "week": 3,
+      "totalQty": 93000,
+      "pos": [
+        {
+          "po_number": "PO-12345",
+          "supplier": "MEADWESTVACO CORPORATION, PRG",
+          "rollstock": "L55",
+          "width": 41.75,
+          "quantity_lf": 56000,
+          "cost": 13792.59,
+          "payment_status": "Paid",
+          "ship_from": "Chicago, IL",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-11-08",
+          "lead_time_weeks": 2
+        },
+        {
+          "po_number": "PO-12346",
+          "supplier": "INTERNATIONAL PAPER",
+          "rollstock": "L55",
+          "width": 28.0,
+          "quantity_lf": 37000,
+          "cost": 9112.96,
+          "payment_status": "Paid",
+          "ship_from": "Memphis, TN",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-11-08",
+          "lead_time_weeks": 2
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "totalQty": 46000,
+      "pos": [
+        {
+          "po_number": "PO-12347",
+          "supplier": "CLEARWATER PAPER CORPORATION",
+          "rollstock": "L563W",
+          "width": 63.0,
+          "quantity_lf": 46000,
+          "cost": 11329.62,
+          "payment_status": "Pending",
+          "ship_from": "Chicago, IL",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-11-15",
+          "lead_time_weeks": 2
+        }
+      ]
+    },
+    {
+      "week": 5,
+      "totalQty": 116000,
+      "pos": [
+        {
+          "po_number": "PO-12348",
+          "supplier": "MEADWESTVACO CORPORATION, PRG",
+          "rollstock": "M33HP",
+          "width": 28.125,
+          "quantity_lf": 78000,
+          "cost": 19211.1,
+          "payment_status": "Paid",
+          "ship_from": "Memphis, TN",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-11-22",
+          "lead_time_weeks": 2
+        },
+        {
+          "po_number": "PO-12349",
+          "supplier": "CLEARWATER PAPER CORPORATION",
+          "rollstock": "L55",
+          "width": 103.0,
+          "quantity_lf": 38000,
+          "cost": 9359.25,
+          "payment_status": "Paid",
+          "ship_from": "Memphis, TN",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-11-22",
+          "lead_time_weeks": 2
+        }
+      ]
+    },
+    {
+      "week": 6,
+      "totalQty": 53000,
+      "pos": [
+        {
+          "po_number": "PO-12350",
+          "supplier": "MEADWESTVACO CORPORATION, PRG",
+          "rollstock": "M23",
+          "width": 54.375,
+          "quantity_lf": 53000,
+          "cost": 13053.7,
+          "payment_status": "Paid",
+          "ship_from": "Memphis, TN",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-11-29",
+          "lead_time_weeks": 2
+        }
+      ]
+    },
+    {
+      "week": 7,
+      "totalQty": 61000,
+      "pos": [
+        {
+          "po_number": "PO-12351",
+          "supplier": "XPEDX",
+          "rollstock": "M33",
+          "width": 54.375,
+          "quantity_lf": 61000,
+          "cost": 15024.07,
+          "payment_status": "Paid",
+          "ship_from": "Memphis, TN",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-12-06",
+          "lead_time_weeks": 2
+        }
+      ]
+    },
+    {
+      "week": 8,
+      "totalQty": 88000,
+      "pos": [
+        {
+          "po_number": "PO-12352",
+          "supplier": "MEADWESTVACO CORPORATION, PRG",
+          "rollstock": "L35",
+          "width": 91.0,
+          "quantity_lf": 45000,
+          "cost": 11083.33,
+          "payment_status": "Pending",
+          "ship_from": "Memphis, TN",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-12-13",
+          "lead_time_weeks": 2
+        },
+        {
+          "po_number": "PO-12353",
+          "supplier": "XPEDX",
+          "rollstock": "M33",
+          "width": 47.75,
+          "quantity_lf": 43000,
+          "cost": 10590.74,
+          "payment_status": "Paid",
+          "ship_from": "Chicago, IL",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-12-13",
+          "lead_time_weeks": 2
+        }
+      ]
+    },
+    {
+      "week": 9,
+      "totalQty": 83000,
+      "pos": [
+        {
+          "po_number": "PO-12354",
+          "supplier": "INTERNATIONAL PAPER -DEL",
+          "rollstock": "L55",
+          "width": 58.125,
+          "quantity_lf": 83000,
+          "cost": 20442.58,
+          "payment_status": "Paid",
+          "ship_from": "Cleveland, OH",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-12-20",
+          "lead_time_weeks": 2
+        }
+      ]
+    },
+    {
+      "week": 10,
+      "totalQty": 102000,
+      "pos": [
+        {
+          "po_number": "PO-12355",
+          "supplier": "INTERNATIONAL PAPER",
+          "rollstock": "L55",
+          "width": 94.0,
+          "quantity_lf": 50000,
+          "cost": 12314.81,
+          "payment_status": "Pending",
+          "ship_from": "Chicago, IL",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-12-27",
+          "lead_time_weeks": 2
+        },
+        {
+          "po_number": "PO-12356",
+          "supplier": "INTERNATIONAL PAPER -DEL",
+          "rollstock": "L55",
+          "width": 63.0,
+          "quantity_lf": 52000,
+          "cost": 12807.4,
+          "payment_status": "Pending",
+          "ship_from": "Cleveland, OH",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2025-12-27",
+          "lead_time_weeks": 2
+        }
+      ]
+    },
+    {
+      "week": 11,
+      "totalQty": 0,
+      "pos": []
+    },
+    {
+      "week": 12,
+      "totalQty": 134000,
+      "pos": [
+        {
+          "po_number": "PO-12357",
+          "supplier": "MEADWESTVACO CORPORATION, PRG",
+          "rollstock": "L55",
+          "width": 33.75,
+          "quantity_lf": 95000,
+          "cost": 23398.14,
+          "payment_status": "Paid",
+          "ship_from": "Cleveland, OH",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2026-01-10",
+          "lead_time_weeks": 2
+        },
+        {
+          "po_number": "PO-12358",
+          "supplier": "INTERNATIONAL PAPER",
+          "rollstock": "M23",
+          "width": 36.0,
+          "quantity_lf": 39000,
+          "cost": 9605.55,
+          "payment_status": "Paid",
+          "ship_from": "Chicago, IL",
+          "ship_to": "PSC Warehouse A",
+          "order_date": "2026-01-10",
+          "lead_time_weeks": 2
+        }
+      ]
+    }
+  ],
+  "consumption": [
+    {
+      "week": 1,
+      "total": 97000,
+      "confirmed": 68684,
+      "expected": 28316,
+      "orders": [
+        {
+          "id": "ORD-001",
+          "customer": "PELCO",
+          "box": "Box 3",
+          "qty": 48000,
+          "status": "Confirmed",
+          "shipDate": "2025-11-08"
+        },
+        {
+          "id": "ORD-002",
+          "customer": "JOIDIR",
+          "box": "Box 5",
+          "qty": 17000,
+          "status": "Confirmed",
+          "shipDate": "2025-11-08"
+        },
+        {
+          "id": "ORD-003",
+          "customer": "GALWIN",
+          "box": "Box 7",
+          "qty": 3684,
+          "status": "Confirmed",
+          "shipDate": "2025-11-08"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "total": 105000,
+      "confirmed": 84356,
+      "expected": 20644,
+      "orders": [
+        {
+          "id": "ORD-004",
+          "customer": "GALWIN",
+          "box": "Box 5",
+          "qty": 42000,
+          "status": "Confirmed",
+          "shipDate": "2025-11-15"
+        },
+        {
+          "id": "ORD-005",
+          "customer": "JOIDIR",
+          "box": "Box 3",
+          "qty": 42356,
+          "status": "Confirmed",
+          "shipDate": "2025-11-15"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "total": 73000,
+      "confirmed": 56171,
+      "expected": 16829,
+      "orders": [
+        {
+          "id": "ORD-006",
+          "customer": "DUNLOP",
+          "box": "Box 6",
+          "qty": 47000,
+          "status": "Confirmed",
+          "shipDate": "2025-11-22"
+        },
+        {
+          "id": "ORD-007",
+          "customer": "PELCO",
+          "box": "Box 6",
+          "qty": 9171,
+          "status": "Confirmed",
+          "shipDate": "2025-11-22"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "total": 107000,
+      "confirmed": 77762,
+      "expected": 29238,
+      "orders": [
+        {
+          "id": "ORD-008",
+          "customer": "DUNLOP",
+          "box": "Box 4",
+          "qty": 16000,
+          "status": "Confirmed",
+          "shipDate": "2025-11-29"
+        },
+        {
+          "id": "ORD-009",
+          "customer": "OWENBB",
+          "box": "Box 7",
+          "qty": 61762,
+          "status": "Confirmed",
+          "shipDate": "2025-11-29"
+        }
+      ]
+    },
+    {
+      "week": 5,
+      "total": 98000,
+      "confirmed": 72311,
+      "expected": 25689,
+      "orders": [
+        {
+          "id": "ORD-010",
+          "customer": "DUNLOP",
+          "box": "Box 7",
+          "qty": 16000,
+          "status": "Confirmed",
+          "shipDate": "2025-12-06"
+        },
+        {
+          "id": "ORD-011",
+          "customer": "DUNLOP",
+          "box": "Box 4",
+          "qty": 56311,
+          "status": "Confirmed",
+          "shipDate": "2025-12-06"
+        }
+      ]
+    },
+    {
+      "week": 6,
+      "total": 89000,
+      "confirmed": 68208,
+      "expected": 20792,
+      "orders": []
+    },
+    {
+      "week": 7,
+      "total": 95000,
+      "confirmed": 78918,
+      "expected": 16082,
+      "orders": []
+    },
+    {
+      "week": 8,
+      "total": 107000,
+      "confirmed": 87035,
+      "expected": 19965,
+      "orders": []
+    },
+    {
+      "week": 9,
+      "total": 116000,
+      "confirmed": 92290,
+      "expected": 23710,
+      "orders": []
+    },
+    {
+      "week": 10,
+      "total": 63000,
+      "confirmed": 44597,
+      "expected": 18403,
+      "orders": []
+    },
+    {
+      "week": 11,
+      "total": 106000,
+      "confirmed": 81608,
+      "expected": 24392,
+      "orders": []
+    },
+    {
+      "week": 12,
+      "total": 96000,
+      "confirmed": 74078,
+      "expected": 21922,
+      "orders": []
+    }
+  ]
+}
