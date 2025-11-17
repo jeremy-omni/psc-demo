@@ -65,6 +65,10 @@
         const { useState, useEffect, useRef, useMemo, createElement: h } = React;
         const { createRoot } = ReactDOM;
 
+        // Configure Chart.js default font
+        Chart.defaults.font.family = "'Mulish', Helvetica, sans-serif";
+        Chart.defaults.font.size = 13;
+
         // Mock Data
         const mockData = {
             purchaseSchedule: [
