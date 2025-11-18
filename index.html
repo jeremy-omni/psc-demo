@@ -275,11 +275,37 @@
             );
         }
 
+        // Constants
+        const LEAD_TIME_WEEKS = 2;
+        const STARTING_INVENTORY = 300000;
+
+        // Helper function to calculate initial inventory
+        const calculateInitialInventory = (arrivals, consumption) => {
+            let currentInventory = STARTING_INVENTORY;
+            const uncertaintyRange = 15000;
+
+            return arrivals.map((_, index) => {
+                const week = index + 1;
+                currentInventory = currentInventory + arrivals[index].totalQty - consumption[index].total;
+
+                return {
+                    week: week,
+                    p10: Math.max(0, currentInventory - uncertaintyRange),
+                    p50: Math.max(0, currentInventory),
+                    p90: currentInventory + uncertaintyRange
+                };
+            });
+        };
+
         // Main App
         function App() {
             const [selectedRollstock, setSelectedRollstock] = useState('M23');
             const [selectedWidth, setSelectedWidth] = useState(70.25);
             const [purchaseData, setPurchaseData] = useState([...mockData.purchaseSchedule]);
+            const [arrivalsData, setArrivalsData] = useState([...mockData.arrivals]);
+            const [inventoryData, setInventoryData] = useState(() =>
+                calculateInitialInventory(mockData.arrivals, mockData.consumption)
+            );
             const [showDecomposed, setShowDecomposed] = useState(false);
             const [selectedArrivalWeek, setSelectedArrivalWeek] = useState(null);
             const [selectedConsumptionWeek, setSelectedConsumptionWeek] = useState(null);
@@ -309,8 +335,89 @@
                 })));
             };
 
+            const recalculateArrivals = (purchaseSchedule) => {
+                // Arrivals(week) = Purchase Schedule(week - lead_time)
+                // But preserve pre-existing orders already in transit
+                return purchaseSchedule.map((_, index) => {
+                    const week = index + 1;
+                    const purchaseWeek = week - LEAD_TIME_WEEKS;
+
+                    // If purchaseWeek <= 0, these are pre-existing orders already in transit
+                    // Keep the original mock data for these weeks
+                    if (purchaseWeek <= 0) {
+                        return { ...mockData.arrivals[index] };
+                    }
+
+                    // For future weeks, calculate based on purchase schedule
+                    if (purchaseWeek > 0 && purchaseWeek <= purchaseSchedule.length) {
+                        const purchaseQty = purchaseSchedule[purchaseWeek - 1].currentQty;
+
+                        // If quantity is 0, no arrivals
+                        if (purchaseQty === 0) {
+                            return { week: week, totalQty: 0, pos: [] };
+                        }
+
+                        // Generate synthetic PO for this arrival
+                        const existingData = mockData.arrivals[index];
+                        const basePO = existingData.pos && existingData.pos.length > 0
+                            ? existingData.pos[0]
+                            : mockData.arrivals[2].pos[0]; // Use Week 3's first PO as template
+
+                        const syntheticPO = {
+                            ...basePO,
+                            po_number: `PO-SYN-${week}`,
+                            quantity_lf: purchaseQty,
+                            cost: Math.round(purchaseQty * 0.5), // $0.50 per LF
+                            order_date: `2025-11-${String(purchaseWeek * 7).padStart(2, '0')}`,
+                            expected_arrival_week: week,
+                            lead_time_weeks: LEAD_TIME_WEEKS
+                        };
+
+                        return {
+                            week: week,
+                            totalQty: purchaseQty,
+                            pos: [syntheticPO]
+                        };
+                    } else {
+                        return {
+                            week: week,
+                            totalQty: 0,
+                            pos: []
+                        };
+                    }
+                });
+            };
+
+            const recalculateInventory = (arrivals, consumption) => {
+                // Inventory(week) = Previous week inventory - consumption + arrivals
+                let currentInventory = STARTING_INVENTORY;
+                const uncertaintyRange = 15000;
+
+                return arrivals.map((_, index) => {
+                    const week = index + 1;
+
+                    // Update inventory: add arrivals, subtract consumption
+                    currentInventory = currentInventory + arrivals[index].totalQty - consumption[index].total;
+
+                    return {
+                        week: week,
+                        p10: Math.max(0, currentInventory - uncertaintyRange),
+                        p50: Math.max(0, currentInventory),
+                        p90: currentInventory + uncertaintyRange
+                    };
+                });
+            };
+
             const handleSave = () => {
-                alert('Purchase schedule saved!');
+                // Recalculate arrivals based on current purchase schedule
+                const newArrivals = recalculateArrivals(purchaseData);
+                setArrivalsData(newArrivals);
+
+                // Recalculate inventory based on new arrivals and consumption
+                const newInventory = recalculateInventory(newArrivals, mockData.consumption);
+                setInventoryData(newInventory);
+
+                alert('Purchase schedule saved! Panels 2 & 3 have been updated.');
             };
 
             const handleQuantityChange = (week, newQty) => {
@@ -344,11 +451,11 @@
             }), [purchaseData]);
 
             const inventoryChartData = useMemo(() => ({
-                labels: mockData.inventoryProjection.map(d => `Week ${d.week}`),
+                labels: inventoryData.map(d => `Week ${d.week}`),
                 datasets: [
                     {
                         label: '90th Percentile',
-                        data: mockData.inventoryProjection.map(d => d.p90),
+                        data: inventoryData.map(d => d.p90),
                         borderColor: 'hsl(50 20.7% 88.6% / 0.8)',
                         backgroundColor: 'hsl(50 20.7% 88.6% / 0.3)',
                         fill: '+1',
@@ -357,7 +464,7 @@
                     },
                     {
                         label: '50th Percentile',
-                        data: mockData.inventoryProjection.map(d => d.p50),
+                        data: inventoryData.map(d => d.p50),
                         borderColor: 'oklch(0.6 0.118 184.704)',
                         borderWidth: 3,
                         pointRadius: 5,
@@ -366,7 +473,7 @@
                     },
                     {
                         label: '10th Percentile',
-                        data: mockData.inventoryProjection.map(d => d.p10),
+                        data: inventoryData.map(d => d.p10),
                         borderColor: 'hsl(50 20.7% 88.6% / 0.8)',
                         backgroundColor: 'transparent',
                         fill: false,
@@ -374,21 +481,21 @@
                         borderWidth: 1
                     }
                 ]
-            }), []);
+            }), [inventoryData]);
 
             const arrivalsChartData = useMemo(() => ({
-                labels: mockData.arrivals.map(d => `Week ${d.week}`),
+                labels: arrivalsData.map(d => `Week ${d.week}`),
                 datasets: [
                     {
                         label: 'Incoming Shipments',
-                        data: mockData.arrivals.map(d => d.totalQty),
+                        data: arrivalsData.map(d => d.totalQty),
                         backgroundColor: 'oklch(0.828 0.189 84.429 / 0.85)',
                         borderColor: 'oklch(0.828 0.189 84.429)',
                         borderWidth: 1,
                         borderRadius: 4
                     }
                 ]
-            }), []);
+            }), [arrivalsData]);
 
             const consumptionChartData = useMemo(() => showDecomposed ? {
                 labels: mockData.consumption.map(d => `Week ${d.week}`),
@@ -461,13 +568,19 @@
             }), [purchaseData]);
 
             const inventoryChartOptions = useMemo(() => ({
+                layout: {
+                    padding: {
+                        left: 45,
+                        right: 45
+                    }
+                },
                 plugins: {
                     tooltip: {
                         callbacks: {
                             title: (items) => items[0].label,
                             label: (context) => {
                                 const dataIndex = context.dataIndex;
-                                const item = mockData.inventoryProjection[dataIndex];
+                                const item = inventoryData[dataIndex];
                                 if (context.datasetIndex === 0) {
                                     return `90th Percentile: ${item.p90.toLocaleString()} LF`;
                                 } else if (context.datasetIndex === 1) {
@@ -478,20 +591,26 @@
                             },
                             afterBody: (items) => {
                                 const dataIndex = items[0].dataIndex;
-                                const item = mockData.inventoryProjection[dataIndex];
+                                const item = inventoryData[dataIndex];
                                 return `\nRange: ${(item.p90 - item.p10).toLocaleString()} LF`;
                             }
                         }
                     }
                 }
-            }), []);
+            }), [inventoryData]);
 
             const arrivalsChartOptions = useMemo(() => ({
+                layout: {
+                    padding: {
+                        left: 45,
+                        right: 45
+                    }
+                },
                 onClick: (event, elements) => {
                     if (elements.length > 0) {
                         const dataIndex = elements[0].index;
-                        const weekData = mockData.arrivals[dataIndex];
-                        if (weekData.pos.length > 0) {
+                        const weekData = arrivalsData[dataIndex];
+                        if (weekData.pos && weekData.pos.length > 0) {
                             setSelectedArrivalWeek(weekData);
                         }
                     }
@@ -502,13 +621,13 @@
                             title: (items) => items[0].label,
                             label: (context) => {
                                 const dataIndex = context.dataIndex;
-                                const qty = mockData.arrivals[dataIndex].totalQty;
+                                const qty = arrivalsData[dataIndex].totalQty;
                                 return `Arriving: ${qty.toLocaleString()} LF`;
                             },
                             afterLabel: (context) => {
                                 const dataIndex = context.dataIndex;
-                                const pos = mockData.arrivals[dataIndex].pos;
-                                if (pos.length > 0) {
+                                const pos = arrivalsData[dataIndex].pos;
+                                if (pos && pos.length > 0) {
                                     return `${pos.length} PO${pos.length > 1 ? 's' : ''} - Click to view details`;
                                 }
                                 return '';
@@ -516,9 +635,15 @@
                         }
                     }
                 }
-            }), [setSelectedArrivalWeek]);
+            }), [arrivalsData, setSelectedArrivalWeek]);
 
             const consumptionChartOptions = useMemo(() => ({
+                layout: {
+                    padding: {
+                        left: 45,
+                        right: 45
+                    }
+                },
                 ...(showDecomposed ? { scales: { x: { stacked: true }, y: { stacked: true } } } : {}),
                 onClick: (event, elements) => {
                     if (showDecomposed && elements.length > 0) {
@@ -613,9 +738,10 @@
                         h(ChartComponent, {
                             type: 'bar',
                             data: purchaseChartData,
-                            options: purchaseChartOptions
+                            options: purchaseChartOptions,
+                            height: 280
                         }),
-                        h('div', { className: 'mt-2', style: { display: 'flex', gap: '4px', paddingLeft: '45px', paddingRight: '45px' } },
+                        h('div', { className: 'mt-2', style: { display: 'flex', gap: '4px', paddingLeft: '80px', paddingRight: '55px' } },
                             purchaseData.map(item =>
                                 h('div', { key: item.week, style: { flex: '1 1 0', minWidth: 0 } },
                                     h('input', {
@@ -636,7 +762,8 @@
                         h(ChartComponent, {
                             type: 'line',
                             data: inventoryChartData,
-                            options: inventoryChartOptions
+                            options: inventoryChartOptions,
+                            height: 280
                         })
                     ),
 
@@ -646,7 +773,8 @@
                         h(ChartComponent, {
                             type: 'bar',
                             data: arrivalsChartData,
-                            options: arrivalsChartOptions
+                            options: arrivalsChartOptions,
+                            height: 280
                         })
                     ),
 
@@ -667,7 +795,8 @@
                         h(ChartComponent, {
                             type: 'bar',
                             data: consumptionChartData,
-                            options: consumptionChartOptions
+                            options: consumptionChartOptions,
+                            height: 280
                         })
                     ),
 
